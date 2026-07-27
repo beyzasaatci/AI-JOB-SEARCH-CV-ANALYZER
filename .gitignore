@@ -1,0 +1,65 @@
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution
+build/
+dist/
+*.egg-info/
+
+# Logs
+*.log
+
+# Environment Variables
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# Jupyter
+.ipynb_checkpoints/
+
+# pytest
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+
+# Ruff
+.ruff_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# spaCy models (only if downloaded locally)
+*.spacy
+
+# ChromaDB / Vector Database
+chroma_db/
+chromadb/
+vector_db/
+db/
+
+# FAISS
+*.faiss
+*.index
+
+# Ollama cache (if any local files)
+ollama/
+
+# Temporary files
+*.tmp
+*.temp
