@@ -63,3 +63,5 @@ ollama/
 # Temporary files
 *.tmp
 *.temp
+
+*.pkl

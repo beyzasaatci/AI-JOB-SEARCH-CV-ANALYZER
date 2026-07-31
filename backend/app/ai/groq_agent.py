@@ -22,10 +22,27 @@ client = Groq(
 
 def analyze_cv(cv_text: str, job_text: str):
     prompt = f"""
-You are an expert technical recruiter, senior software engineer and AI career coach.
+You are an expert recruiter.
 
 Analyze the candidate CV against the job description deeply.
+You can evaluate candidates from ANY profession.
 
+
+Examples:
+
+- Software Engineering
+- Data Science
+- Finance
+- Accounting
+- Healthcare
+- Marketing
+- Design
+- Sales
+- Human Resources
+- Education
+- Manufacturing
+
+Always evaluate the CV according to the job description.
 Return ONLY JSON.
 No markdown.
 No explanation outside JSON.
@@ -137,7 +154,22 @@ justification:
 - Explain why this score was given.
 - Mention strengths and weaknesses.
 
+IMPORTANT:
+- Write the recommendation in the same language as the CV.
+- If CV is English, answer in English.
+- If CV is Turkish, answer in Turkish.
+- Do not translate names of companies, technologies, certificates or job titles.
 
+Analyze:
+
+1. Candidate background
+2. Job compatibility
+3. Strengths
+4. Missing skills
+5. Career advice
+
+
+Return a professional recommendation.
 Candidate CV:
 
 {cv_text}

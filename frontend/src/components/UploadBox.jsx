@@ -180,9 +180,9 @@ return (
 min-h-screen
 w-full
 bg-gradient-to-br
-from-blue-100
-via-white
-to-purple-100
+from-slate-900
+via-blue-900
+to-slate-800
 flex
 items-center
 justify-center
@@ -190,14 +190,16 @@ p-6
 ">
 
 
-
 <div className="
-bg-white
-max-w-4xl
+bg-white/95
+backdrop-blur
+max-w-5xl
 w-full
 rounded-3xl
 shadow-2xl
 p-10
+border
+border-blue-100
 ">
 
 
@@ -221,8 +223,9 @@ animate-bounce
 <h1 className="
 text-5xl
 font-extrabold
-text-gray-800
+text-blue-900
 mt-4
+tracking-tight
 ">
 
 AI Job Matcher
@@ -232,7 +235,7 @@ AI Job Matcher
 
 
 <p className="
-text-gray-500
+text-slate-500
 text-lg
 mt-3
 ">
@@ -256,7 +259,7 @@ loading && (
 
 <div className="
 mt-8
-bg-purple-50
+bg-blue-50
 rounded-2xl
 p-6
 ">
@@ -265,7 +268,7 @@ p-6
 <h2 className="
 text-xl
 font-bold
-text-purple-700
+text-blue-700
 mb-5
 ">
 
@@ -357,12 +360,15 @@ cursor-pointer
 block
 border-2
 border-dashed
-border-blue-400
+border-blue-300
 rounded-3xl
 p-12
 text-center
-hover:bg-blue-50
-transition
+bg-blue-50/50
+hover:bg-blue-100
+hover:border-blue-600
+transition-all
+duration-300
 "
 
 
@@ -594,21 +600,21 @@ disabled={loading}
 className="
 mt-8
 w-full
-bg-gradient-to-r
-from-blue-600
-to-purple-600
+bg-blue-700
+hover:bg-blue-800
 text-white
 py-5
 rounded-2xl
 text-xl
 font-bold
-hover:scale-105
-transition
+shadow-md
+hover:shadow-xl
+transition-all
+duration-300
 disabled:opacity-50
 "
 
 >
-
 
 {
 loading

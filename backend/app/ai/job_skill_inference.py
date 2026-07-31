@@ -20,11 +20,15 @@ client = Groq(
 skill_cache = {}
 
 
+
 def infer_job_skills(job_text: str):
+
 
     key = hashlib.md5(
         job_text.encode()
     ).hexdigest()
+
+
 
     if key in skill_cache:
 
@@ -32,96 +36,233 @@ def infer_job_skills(job_text: str):
 
         return skill_cache[key]
 
+
+
     print("GROQ SKILL EXTRACTION")
 
-    
+
 
     prompt = f"""
-    You are a senior technical recruiter.
 
-    Read the following job description.
+You are an expert recruiter and career analyst.
 
-    Extract ONLY the technical skills that are explicitly mentioned.
+Analyze this job description.
 
-    Rules:
-    - Return ONLY valid JSON.
-    - Do NOT guess missing technologies.
-    - Do NOT invent skills.
-    - Do NOT include soft skills.
-    - Do NOT include job titles.
-    - Preserve original technology names.
+This system supports ALL professions:
 
-    Format:
+- Software
+- Engineering
+- Finance
+- Marketing
+- Sales
+- Human Resources
+- Design
+- Healthcare
+- Operations
+- Other professional fields
 
-    {{
-        "skills": [
-            "Java",
-            "Spring Boot",
-            "Docker"
-        ]
-    }}
 
-    Job Description:
+Extract:
 
-    {job_text}
-    """
+1. category:
+Main job field.
+
+
+2. skills:
+Required professional skills.
+
+
+3. tools:
+Software, platforms, systems, equipment or methods.
+
+
+4. domain_knowledge:
+Industry knowledge or expertise areas.
+
+
+
+Rules:
+
+- Return ONLY valid JSON.
+- Do not invent unrelated skills.
+- Do not focus only on technology.
+- Do not include job titles as skills.
+- Include only relevant professional skills.
+
+
+
+Format:
+
+
+{{
+    "category": "",
+    "skills": [],
+    "tools": [],
+    "domain_knowledge": []
+}}
+
+
+
+Job Description:
+
+
+{job_text}
+
+"""
+
+
 
     try:
 
+
         response = client.chat.completions.create(
+
 
             model="llama-3.1-8b-instant",
 
+
             temperature=0,
+
 
             response_format={
                 "type": "json_object"
             },
 
+
             messages=[
+
                 {
                     "role": "user",
                     "content": prompt
                 }
+
             ]
+
         )
+
+
 
     except Exception as e:
 
-        print("GROQ ERROR:", e)
+
+        print(
+            "GROQ ERROR:",
+            e
+        )
+
 
         return []
 
-    data = json.loads(
-        response.choices[0].message.content
-    )
+
+
+    try:
+
+
+        data = json.loads(
+            response.choices[0].message.content
+        )
+
+
+    except Exception as e:
+
+
+        print(
+            "JSON ERROR:",
+            e
+        )
+
+
+        return []
+
+
+
 
     skills = []
 
-    for x in data.get("skills", []):
+
+
+    all_skills = (
+
+        data.get(
+            "skills",
+            []
+        )
+
+        +
+
+        data.get(
+            "tools",
+            []
+        )
+
+        +
+
+        data.get(
+            "domain_knowledge",
+            []
+        )
+
+    )
+
+
+
+    for x in all_skills:
+
+
 
         if isinstance(x, str):
+
 
             skills.append(
                 x.lower().strip()
             )
 
+
+
         elif isinstance(x, dict):
 
+
             skill = (
+
                 x.get("skill")
-                or x.get("name")
-                or x.get("technology")
+
+                or
+
+                x.get("name")
+
+                or
+
+                x.get("technology")
+
             )
 
+
+
             if skill:
+
 
                 skills.append(
                     skill.lower().strip()
                 )
 
+
+
+
+    skills = list(
+        dict.fromkeys(skills)
+    )
+
+
+
     skill_cache[key] = skills
 
-    print("AI SKILLS:", skills)
+
+
+    print(
+        "AI SKILLS:",
+        skills
+    )
+
+
 
     return skills

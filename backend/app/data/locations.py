@@ -1,67 +1,137 @@
 locations = {
+  "Turkey": [
+    "Istanbul",
+    "Ankara",
+    "Izmir",
+    "Bursa",
+    "Antalya",
+    "Adana",
+    "Konya",
+    "Gaziantep",
+    "Kocaeli",
+    "Mersin",
+    "Kayseri",
+    "Eskisehir",
+    "Samsun",
+    "Trabzon"
+  ],
 
-    "Turkey": [
-        "Istanbul",
-        "Ankara",
-        "Izmir",
-        "Bursa",
-        "Antalya",
-        "Kocaeli",
-        "Adana",
-        "Konya"
-    ],
+  "Germany": [
+    "Berlin",
+    "Munich",
+    "Hamburg",
+    "Frankfurt",
+    "Cologne",
+    "Stuttgart",
+    "Dusseldorf",
+    "Dortmund",
+    "Leipzig",
+    "Bremen"
+  ],
 
-    "Germany": [
-        "Berlin",
-        "Munich",
-        "Hamburg",
-        "Frankfurt",
-        "Cologne",
-        "Stuttgart"
-    ],
 
-    "United States": [
-        "New York",
-        "San Francisco",
-        "Seattle",
-        "Boston",
-        "Austin"
-    ],
+  "United States": [
+    "New York",
+    "San Francisco",
+    "Seattle",
+    "Boston",
+    "Austin",
+    "Chicago",
+    "Los Angeles",
+    "Washington DC",
+    "Denver",
+    "Atlanta"
+  ],
 
-    "United Kingdom": [
-        "London",
-        "Manchester",
-        "Birmingham",
-        "Cambridge"
-    ],
 
-    "Netherlands": [
-        "Amsterdam",
-        "Rotterdam",
-        "Eindhoven"
-    ],
+  "United Kingdom": [
+    "London",
+    "Manchester",
+    "Birmingham",
+    "Liverpool",
+    "Edinburgh",
+    "Leeds",
+    "Bristol",
+    "Cambridge",
+    "Oxford"
+  ],
 
-    "France": [
-        "Paris",
-        "Lyon",
-        "Toulouse"
-    ],
 
-    "Canada": [
-        "Toronto",
-        "Vancouver",
-        "Montreal"
-    ],
+  "Netherlands": [
+    "Amsterdam",
+    "Rotterdam",
+    "Utrecht",
+    "Eindhoven",
+    "The Hague",
+    "Groningen"
+  ],
 
-    "Spain": [
-        "Madrid",
-        "Barcelona",
-        "Valencia"
-    ],
 
-    "Italy": [
-        "Rome",
-        "Milan",
-        "Turin"
-    ]
-}
+  "France": [
+    "Paris",
+    "Lyon",
+    "Marseille",
+    "Toulouse",
+    "Nice",
+    "Bordeaux"
+  ],
+
+
+  "Canada": [
+    "Toronto",
+    "Vancouver",
+    "Montreal",
+    "Ottawa",
+    "Calgary"
+  ],
+
+
+  "Spain": [
+    "Madrid",
+    "Barcelona",
+    "Valencia",
+    "Seville",
+    "Bilbao"
+  ],
+
+
+  "Italy": [
+    "Rome",
+    "Milan",
+    "Turin",
+    "Florence",
+    "Bologna"
+  ],
+
+
+  "Sweden": [
+    "Stockholm",
+    "Gothenburg",
+    "Malmo",
+    "Uppsala"
+  ],
+
+
+  "Poland": [
+    "Warsaw",
+    "Krakow",
+    "Wroclaw",
+    "Poznan"
+  ],
+
+
+  "Australia": [
+    "Sydney",
+    "Melbourne",
+    "Brisbane",
+    "Perth"
+  ],
+
+  
+  "Japan": [
+    "Tokyo",
+    "Osaka",
+    "Kyoto",
+    "Yokohama"
+  ]
+};

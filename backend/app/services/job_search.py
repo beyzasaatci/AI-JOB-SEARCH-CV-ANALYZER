@@ -1,96 +1,107 @@
 import os
 import requests
+
 from dotenv import load_dotenv
 from requests.auth import HTTPBasicAuth
 from pathlib import Path
 
 
-load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+load_dotenv(
+    Path(__file__).resolve().parents[2] / ".env"
+)
 
 
-API_KEY = os.getenv("CAREERJET_API_KEY")
+API_KEY = os.getenv(
+    "CAREERJET_API_KEY"
+)
+
 
 if not API_KEY:
-    raise ValueError("CAREERJET_API_KEY not found")
+    raise ValueError(
+        "CAREERJET_API_KEY not found"
+    )
 
 
 URL = "https://search.api.careerjet.net/v4/query"
 
 
 
-def search_jobs(keyword: str, location: str = "Turkey"):
-
-
-    user_ip = requests.get(
-        "https://api.ipify.org",
-        timeout=10
-    ).text
+# IP CACHE
+USER_IP = None
 
 
 
-    search_locations = [
+def get_user_ip():
+
+    global USER_IP
+
+
+    if USER_IP:
+        return USER_IP
+
+
+    try:
+
+        USER_IP = requests.get(
+            "https://api.ipify.org",
+            timeout=3
+        ).text
+
+
+    except:
+
+        USER_IP="127.0.0.1"
+
+
+
+    return USER_IP
+
+
+
+
+def search_jobs(
+    keyword:str,
+    location:str="Turkey"
+):
+
+
+    user_ip=get_user_ip()
+
+
+
+    params={
+
+        "keywords":keyword,
+
+        "location":location,
+
+        "locale_code":"tr_TR",
+
+        "page":1,
+
+        "page_size":5,
+
+        "user_ip":user_ip,
+
+        "user_agent":
+        "Mozilla/5.0"
+
+    }
+
+
+
+    print(
+        "SEARCHING:",
+        keyword,
         location
-    ]
-
-
-    # Şehir fallback
-    parts = location.split()
-
-    if len(parts) > 1:
-
-        city = parts[-1]
-
-        search_locations.append(city)
-
-
-
-    # Türkiye fallback
-
-    search_locations.append(
-        "Turkey"
     )
 
 
 
-    # duplicate temizle
-
-    search_locations = list(
-        dict.fromkeys(search_locations)
-    )
+    try:
 
 
-
-
-    for loc in search_locations:
-
-
-        print(
-            "SEARCHING LOCATION:",
-            loc
-        )
-
-
-        params = {
-
-            "keywords": keyword,
-
-            "location": loc,
-
-            "locale_code": "tr_TR",
-
-            "page": 1,
-
-            "page_size": 10,
-
-            "user_ip": user_ip,
-
-            "user_agent": "Mozilla/5.0"
-
-        }
-
-
-
-        response = requests.get(
+        response=requests.get(
 
             URL,
 
@@ -106,35 +117,52 @@ def search_jobs(keyword: str, location: str = "Turkey"):
 
             },
 
+
             auth=HTTPBasicAuth(
                 API_KEY,
                 ""
             ),
 
-            timeout=30
+
+            timeout=10
 
         )
 
 
 
-        data = response.json()
+        response.raise_for_status()
+
+
+
+        data=response.json()
 
 
 
         print(
             "FOUND JOBS:",
-            len(data.get("jobs", []))
+            len(
+                data.get(
+                    "jobs",
+                    []
+                )
+            )
         )
 
 
 
-        if data.get("jobs"):
-
-            return data
+        return data
 
 
 
+    except Exception as e:
 
-    return {
-        "jobs":[]
-    }
+
+        print(
+            "CAREERJET ERROR:",
+            e
+        )
+
+
+        return {
+            "jobs":[]
+        }

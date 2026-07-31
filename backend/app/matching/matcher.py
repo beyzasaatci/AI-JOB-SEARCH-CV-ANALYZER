@@ -1,36 +1,38 @@
+from concurrent.futures import ThreadPoolExecutor
+
 from app.matching.embedding import create_embedding
 from app.matching.similarity import calculate_similarity
-from app.matching.skill_match import calculate_skill_overlap
-from app.matching.job_skill_extractor import extract_job_skills
-from app.ai.job_skill_inference import infer_job_skills
-from app.data.skills import normalize_skill
-from app.matching.embedding_cache import embedding_cache
+from app.ai.skill_matcher import ai_skill_match
+
+from app.matching.embedding_cache import (
+    embedding_cache,
+    save_cache
+)
+
 from app.matching.job_filter import remove_duplicate_jobs
 
 
-def normalize_skill_list(skills):
 
-    normalized = []
+MAX_AI_JOBS = 6
 
-    for skill in skills:
-        normalized.append(
-            normalize_skill(skill)
-        )
-
-    return list(dict.fromkeys(normalized))
 
 
 def match_jobs(
-        candidate_text,
-        jobs,
-        candidate_skills=None
+    candidate_text,
+    jobs,
+    candidate_skills=None
 ):
+
 
     if candidate_skills is None:
         candidate_skills = []
 
 
-    jobs = remove_duplicate_jobs(jobs)
+
+    jobs = remove_duplicate_jobs(
+        jobs
+    )
+
 
 
     candidate_embedding = create_embedding(
@@ -38,131 +40,269 @@ def match_jobs(
     )
 
 
-    candidate_skills = normalize_skill_list(
-        candidate_skills
-    )
+
+    scored_jobs = []
 
 
-    results = []
 
-
-    MAX_AI_JOBS = 10
-    ai_count = 0
+    # ======================
+    # SEMANTIC SEARCH
+    # ======================
 
 
     for index, job in enumerate(jobs):
 
 
-        job_text = (
-            f"{job.title} {job.description}"
-        )
+        job_text = f"""
+Title:
+{job.title}
+
+Description:
+{job.description[:1000]}
+"""
 
 
-        # =========================
-        # EMBEDDING
-        # =========================
 
         if job_text in embedding_cache:
 
-            print("EMBEDDING CACHE HIT")
+
+            print(
+                "EMBEDDING CACHE HIT"
+            )
+
 
             job_embedding = embedding_cache[job_text]
 
 
+
         else:
 
-            print("CREATING EMBEDDING")
+
+            print(
+                "CREATING EMBEDDING"
+            )
+
 
             job_embedding = create_embedding(
                 job_text
             )
 
+
             embedding_cache[job_text] = job_embedding
 
 
 
+
         semantic_score = calculate_similarity(
+
             candidate_embedding,
+
             job_embedding
+
         )
 
 
-        # =========================
-        # SKILLS
-        # =========================
 
-        explicit_skills = extract_job_skills(
-            job_text
+        scored_jobs.append(
+
+            {
+
+                "id": index,
+
+                "job": job,
+
+                "job_text": job_text,
+
+                "semantic_score": semantic_score
+
+            }
+
         )
 
-        print("REGEX:", explicit_skills)
+
+
+    # cache tek sefer kaydet
+    save_cache()
 
 
 
-        # Regex yeterliyse AI çağırma
-        if len(explicit_skills) >= 2:
+    scored_jobs.sort(
+
+        key=lambda x:x["semantic_score"],
+
+        reverse=True
+
+    )
 
 
-            job_skills = normalize_skill_list(
-                explicit_skills
+
+    # ======================
+    # AI MATCH TOP 6
+    # ======================
+
+
+    top_jobs = scored_jobs[:MAX_AI_JOBS]
+
+
+
+    def ai_call(item):
+
+
+        return ai_skill_match(
+
+            candidate_text[:2000],
+
+            item["job_text"][:1000]
+
+        )
+
+
+
+    with ThreadPoolExecutor(
+
+        max_workers=2
+
+    ) as executor:
+
+
+        ai_results = list(
+
+            executor.map(
+
+                ai_call,
+
+                top_jobs
+
             )
+
+        )
+
+
+
+    results = []
+
+
+
+    # ======================
+    # RESULT CREATE
+    # ======================
+
+
+    for index,item in enumerate(scored_jobs):
+
+
+        job = item["job"]
+
+
+
+        if index < MAX_AI_JOBS:
+
+
+            ai_result = ai_results[index]
+
 
 
         else:
 
-            ai_skills = []
+
+            # AI bakmadıysa semantic sonucu kullan
+
+            ai_result = {
+
+                "profession_match": 50,
+
+                "skill_score": 50,
+
+                "matched_skills": [],
+
+                "missing_skills": [],
+
+                "reason":
+                "Semantic similarity match"
+
+            }
 
 
-            if ai_count < MAX_AI_JOBS:
 
 
-                ai_skills = infer_job_skills(
-                    job_text
-                )
+        profession_score = ai_result.get(
+
+            "profession_match",
+
+            0
+
+        )
 
 
-                ai_count += 1
+        skill_score = ai_result.get(
 
+            "skill_score",
 
+            0
 
-            job_skills = normalize_skill_list(
-                explicit_skills + ai_skills
-            )
-
-
-
-        # =========================
-        # SKILL SCORE
-        # =========================
-
-        skill_score = calculate_skill_overlap(
-            candidate_skills,
-            job_skills
         )
 
 
 
-        # =========================
-        # FINAL SCORE
-        # =========================
+        if not isinstance(
+
+            profession_score,
+
+            (int,float)
+
+        ):
+
+            profession_score = 0
+
+
+
+        if not isinstance(
+
+            skill_score,
+
+            (int,float)
+
+        ):
+
+            skill_score = 0
+
+
+
+
+        # SADECE AI KONTROL ETTİKLERİNİ ELE
+
+        if index < MAX_AI_JOBS:
+
+
+            if profession_score < 30:
+
+                continue
+
+
+
 
         final_score = (
 
-            semantic_score * 0.45
+            item["semantic_score"] * 0.30
 
             +
 
-            skill_score * 0.55
+            skill_score * 0.50
+
+            +
+
+            profession_score * 0.20
 
         )
+
 
 
 
         results.append(
+
             {
 
-                # YENİ EKLENDİ
-                "id": index + 1,
+                "id": item["id"],
 
 
                 "title": job.title,
@@ -174,38 +314,80 @@ def match_jobs(
                 "location": job.location,
 
 
-                "semantic_score": round(
-                    semantic_score,
+
+                "semantic_score":
+                round(
+                    item["semantic_score"],
                     2
                 ),
 
 
-                "skill_score": round(
+
+                "skill_score":
+                round(
                     skill_score,
                     2
                 ),
 
 
-                "match_score": round(
+
+                "profession_match":
+                round(
+                    profession_score,
+                    2
+                ),
+
+
+
+                "match_score":
+                round(
                     final_score,
                     2
                 ),
 
 
-                "skills_found": job_skills,
+
+                "matched_skills":
+                ai_result.get(
+                    "matched_skills",
+                    []
+                ),
 
 
-                "url": job.posting_url
+
+                "missing_skills":
+                ai_result.get(
+                    "missing_skills",
+                    []
+                ),
+
+
+
+                "reason":
+                ai_result.get(
+                    "reason",
+                    ""
+                ),
+
+
+
+                "url":
+                job.posting_url
 
             }
+
         )
 
 
 
     results.sort(
-        key=lambda x: x["match_score"],
+
+        key=lambda x:x["match_score"],
+
         reverse=True
+
     )
+
 
 
     return results

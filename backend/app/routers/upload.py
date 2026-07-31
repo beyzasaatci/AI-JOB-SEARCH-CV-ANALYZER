@@ -16,8 +16,8 @@ from app.services.s3_service import (
 )
 from app.services.parser import parse_cv
 from app.services.contact import extract_contacts
+from app.ai.cv_skill_extractor import extract_cv_profile
 
-from app.data.skills import normalize_skill
 from app.models.candidate import CandidateProfile
 
 from app.services.job_keyword import generate_job_keywords
@@ -130,9 +130,25 @@ async def upload_cv(
     # =========================
     # CV PARSING
     # =========================
-
     profile = parse_cv(
         text
+    )
+
+
+    ai_profile = extract_cv_profile(
+        text
+    )
+
+
+    profile["skills"] = ai_profile.get(
+        "skills",
+        []
+    )
+
+
+    profile["category"] = ai_profile.get(
+        "category",
+        ""
     )
 
 
@@ -145,22 +161,12 @@ async def upload_cv(
     # =========================
     # SKILL NORMALIZATION
     # =========================
-
-    profile["skills"] = [
-
-        normalize_skill(skill)
-
-        for skill in profile.get(
-            "skills",
-            []
-        )
-
-    ]
-
-
     profile["skills"] = list(
         dict.fromkeys(
-            profile["skills"]
+            profile.get(
+                "skills",
+                []
+            )
         )
     )
 
@@ -178,7 +184,10 @@ async def upload_cv(
 
     candidate_text = text
 
-    candidate_skills = profile["skills"]
+    candidate_skills = ai_profile.get(
+    "skills",
+    []
+    )
 
 
 
@@ -187,8 +196,9 @@ async def upload_cv(
     # =========================
 
     job_keywords = generate_job_keywords(
-        candidate_skills
+    ai_profile
     )
+    
 
 
     print("===================")

@@ -12,46 +12,46 @@ function JobCard({ job }) {
 
 
 
-  const score = Math.round(job.match_score);
+  const score = Math.round(job.match_score || 0);
+const skillScore = Math.round(job.skill_score || 0);
 
 
 
   const getScoreStyle = () => {
 
-    if(score >= 80){
-
-      return {
-        color:"text-green-700",
-        bg:"bg-green-100",
-        label:"🟢 Excellent Match"
-      };
-
-    }
-
-
-    if(score >= 50){
-
-      return {
-        color:"text-yellow-700",
-        bg:"bg-yellow-100",
-        label:"🟡 Good Match"
-      };
-
-    }
-
+  if (skillScore >= 70) {
 
     return {
-
-      color:"text-red-700",
-      bg:"bg-red-100",
-      label:"🔴 Weak Match"
-
+      color: "text-green-700",
+      bg: "bg-green-100",
+      label: "Excellent Skills Match"
     };
+
+  }
+
+
+  if (skillScore >= 20) {
+
+    return {
+      color: "text-yellow-700",
+      bg: "bg-yellow-100",
+      label: "Normal Match"
+    };
+
+  }
+
+
+  return {
+
+    color: "text-blue-700",
+
+    bg: "bg-blue-100",
+
+    label: "Low Skill Match"
 
   };
 
-
-
+};
   const scoreStyle = getScoreStyle();
 
 

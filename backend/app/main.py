@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from app.routers.upload import router as upload_router
 from app.routers.jobs import router as jobs_router
-from app.routers.matching import router as matching_router
 from app.routers import recommendations
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import locations
@@ -25,9 +24,7 @@ def root():
 
 app.include_router(upload_router)
 app.include_router(jobs_router)
-app.include_router(
-    matching_router
-)
+
 app.include_router(
     recommendations.router
 )
