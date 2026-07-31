@@ -3,12 +3,9 @@ import requests
 
 from dotenv import load_dotenv
 from requests.auth import HTTPBasicAuth
-from pathlib import Path
 
 
-load_dotenv(
-    Path(__file__).resolve().parents[2] / ".env"
-)
+load_dotenv()
 
 
 API_KEY = os.getenv(

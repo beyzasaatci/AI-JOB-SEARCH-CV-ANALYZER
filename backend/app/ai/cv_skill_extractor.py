@@ -45,7 +45,7 @@ Format:
 
 CV:
 
-{cv_text}
+{cv_text[:4000]}
 
 """
 

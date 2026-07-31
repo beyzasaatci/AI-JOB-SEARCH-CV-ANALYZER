@@ -13,7 +13,7 @@ from app.matching.job_filter import remove_duplicate_jobs
 
 
 
-MAX_AI_JOBS = 6
+MAX_AI_JOBS = 4
 
 
 
@@ -205,13 +205,15 @@ Description:
         else:
 
 
-            # AI bakmadıysa semantic sonucu kullan
+            # AI bakmadıysa skoru embedding benzerliğine bağla
+
+            semantic_pct = round(item["semantic_score"])
 
             ai_result = {
 
-                "profession_match": 50,
+                "profession_match": semantic_pct,
 
-                "skill_score": 50,
+                "skill_score": semantic_pct,
 
                 "matched_skills": [],
 

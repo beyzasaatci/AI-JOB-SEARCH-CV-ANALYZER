@@ -687,7 +687,7 @@ result.matches?.map((job)=>(
 
 <JobCard
 
-key={job.id}
+key={`${result.file_id}-${job.id}`}
 
 job={job}
 
