@@ -65,3 +65,6 @@ ollama/
 *.temp
 
 *.pkl
+Dockerfile
+.dockerignore
+docker-compose.yml
