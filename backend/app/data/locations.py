@@ -134,4 +134,4 @@ locations = {
     "Kyoto",
     "Yokohama"
   ]
-};
+}

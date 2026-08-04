@@ -19,12 +19,11 @@ function UploadBox() {
 
   useEffect(() => {
     api.get("/locations")
-      .then((res) => {
-        setLocations(res.data);
-      })
-      .catch((err) => {
-        console.log("Locations error:", err);
-      });
+  .then((res) => {
+    console.log("LOCATIONS:", res.data);
+    console.log("Turkey:", res.data["Turkey"]);
+    setLocations(res.data);
+  });
   }, []);
 
   const upload = async () => {
