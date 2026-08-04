@@ -19,11 +19,8 @@ function UploadBox() {
 
   useEffect(() => {
     api.get("/locations")
-  .then((res) => {
-    console.log("LOCATIONS:", res.data);
-    console.log("Turkey:", res.data["Turkey"]);
-    setLocations(res.data);
-  });
+      .then((res) => setLocations(res.data))
+      .catch((err) => console.error("LOCATIONS FAILED:", api.defaults.baseURL, err));
   }, []);
 
   const upload = async () => {
