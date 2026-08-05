@@ -13,7 +13,7 @@ def normalize_jobs(data):
             location=item.get("locations", ""),
             description=item.get("description", ""),
             posting_url=item.get("url", ""),
-            source="CareerJet"
+            source="Adzuna"
         )
 
         jobs.append(job)

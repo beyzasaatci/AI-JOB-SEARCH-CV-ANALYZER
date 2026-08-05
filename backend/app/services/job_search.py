@@ -1,165 +1,102 @@
 import os
-import requests
 
+import requests
 from dotenv import load_dotenv
-from requests.auth import HTTPBasicAuth
+
+from app.data.locations import COUNTRY_CODES
 
 
 load_dotenv()
 
 
-API_KEY = os.getenv(
-    "CAREERJET_API_KEY"
-)
+APP_ID = os.getenv("ADZUNA_APP_ID")
+APP_KEY = os.getenv("ADZUNA_APP_KEY")
 
 
-if not API_KEY:
-    raise ValueError(
-        "CAREERJET_API_KEY not found"
-    )
+if not APP_ID or not APP_KEY:
+    raise ValueError("ADZUNA_APP_ID / ADZUNA_APP_KEY not found")
 
 
-URL = "https://search.api.careerjet.net/v4/query"
+URL = "https://api.adzuna.com/v1/api/jobs/{country}/search/1"
+
+PAGE_SIZE = 5
 
 
+def split_location(location):
+    """'United States New York' -> ('us', 'New York'). Bilinmeyen ulke -> (None, ...)."""
 
-# IP CACHE
-USER_IP = None
+    for name, code in COUNTRY_CODES.items():
 
+        if location == name:
+            return code, ""
 
+        if location.startswith(name + " "):
+            return code, location[len(name) + 1:]
 
-def get_user_ip():
-
-    global USER_IP
-
-
-    if USER_IP:
-        return USER_IP
-
-
-    try:
-
-        USER_IP = requests.get(
-            "https://api.ipify.org",
-            timeout=3
-        ).text
+    return None, location
 
 
-    except:
+def search_jobs(keyword: str, location: str = "Germany"):
 
-        USER_IP="127.0.0.1"
+    country, city = split_location(location)
 
+    if not country:
+        print("UNSUPPORTED LOCATION:", location)
+        return {"jobs": []}
 
-
-    return USER_IP
-
-
-
-
-def search_jobs(
-    keyword:str,
-    location:str="Turkey"
-):
-
-
-    user_ip=get_user_ip()
-
-
-
-    params={
-
-        "keywords":keyword,
-
-        "location":location,
-
-        "locale_code":"tr_TR",
-
-        "page":1,
-
-        "page_size":5,
-
-        "user_ip":user_ip,
-
-        "user_agent":
-        "Mozilla/5.0"
-
+    params = {
+        "app_id": APP_ID,
+        "app_key": APP_KEY,
+        "what": keyword,
+        "results_per_page": PAGE_SIZE,
+        "content-type": "application/json",
     }
 
+    if city:
+        params["where"] = city
 
-
-    print(
-        "SEARCHING:",
-        keyword,
-        location
-    )
-
-
+    print("SEARCHING:", keyword, "|", country, city)
 
     try:
 
-
-        response=requests.get(
-
-            URL,
-
+        response = requests.get(
+            URL.format(country=country),
             params=params,
-
-            headers={
-
-                "Referer":
-                "http://localhost:8000",
-
-                "User-Agent":
-                "Mozilla/5.0"
-
-            },
-
-
-            auth=HTTPBasicAuth(
-                API_KEY,
-                ""
-            ),
-
-
-            timeout=10
-
+            timeout=10,
         )
-
-
 
         response.raise_for_status()
 
+        results = response.json().get("results", [])
 
+        print("FOUND JOBS:", len(results))
 
-        data=response.json()
-
-
-
-        print(
-            "FOUND JOBS:",
-            len(
-                data.get(
-                    "jobs",
-                    []
-                )
-            )
-        )
-
-
-
-        return data
-
-
+        # normalize_jobs'in bekledigi anahtarlara cevir
+        return {
+            "jobs": [
+                {
+                    "title": item.get("title", ""),
+                    "company": item.get("company", {}).get("display_name", ""),
+                    "locations": item.get("location", {}).get("display_name", ""),
+                    "description": item.get("description", ""),
+                    "url": item.get("redirect_url", ""),
+                }
+                for item in results
+            ]
+        }
 
     except Exception as e:
 
+        print("ADZUNA ERROR:", e)
 
-        print(
-            "CAREERJET ERROR:",
-            e
-        )
+        return {"jobs": []}
 
 
-        return {
-            "jobs":[]
-        }
+if __name__ == "__main__":
+    # ponytail: tek kontrol - cok kelimeli ulke adi dogru ayrisiyor mu
+    assert split_location("United States New York") == ("us", "New York")
+    assert split_location("Germany Berlin") == ("de", "Berlin")
+    assert split_location("Netherlands The Hague") == ("nl", "The Hague")
+    assert split_location("Germany") == ("de", "")
+    assert split_location("Turkey Istanbul") == (None, "Turkey Istanbul")
+    print("ok")

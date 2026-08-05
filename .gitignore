@@ -65,6 +65,12 @@ ollama/
 *.temp
 
 *.pkl
-Dockerfile
-.dockerignore
-docker-compose.yml
+
+# node
+node_modules/
+
+# image icinde uretiliyor, elle kopyalanmasin
+backend/static/
+
+# API key'ler icinde, commit edilmesin
+ecs-task-definition.json

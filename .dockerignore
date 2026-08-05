@@ -1,0 +1,11 @@
+**/node_modules
+**/venv
+**/__pycache__
+**/dist
+**/.env
+**/.env.*
+.git
+backend/static
+backend/embedding_cache.pkl
+backend/package.json
+backend/package-lock.json

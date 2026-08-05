@@ -3,7 +3,7 @@ import api from "../services/api";
 
 function UploadBox() {
   const [file, setFile] = useState(null);
-  const [country, setCountry] = useState("Turkey");
+  const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
   const [locations, setLocations] = useState({});
   const [loading, setLoading] = useState(false);
@@ -19,7 +19,11 @@ function UploadBox() {
 
   useEffect(() => {
     api.get("/locations")
-      .then((res) => setLocations(res.data))
+      .then((res) => {
+        setLocations(res.data);
+        // ponytail: varsayilani hardcode etmiyoruz, ulke listesi degisince kirilmasin
+        setCountry(Object.keys(res.data)[0] ?? "");
+      })
       .catch((err) => console.error("LOCATIONS FAILED:", api.defaults.baseURL, err));
   }, []);
 

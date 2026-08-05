@@ -7,4 +7,10 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  // ponytail: baseURL "/api" relative; dev'de backend'e proxy'le, prod'da FastAPI zaten servis ediyor
+  server: {
+    proxy: {
+      "/api": "http://localhost:8000",
+    },
+  },
 });

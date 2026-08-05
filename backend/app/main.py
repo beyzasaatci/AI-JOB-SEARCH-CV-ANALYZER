@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -41,8 +41,9 @@ async def root():
 # React Router support
 @app.get("/{full_path:path}")
 async def spa(full_path: str):
-    # API istekleri buraya düşmesin
+    # API istekleri buraya düşmesin. ponytail: gercek 404 don, yoksa frontend
+    # HTML'i JSON sanip sessizce bozulur (ulke listesi 0 1 2 3 olayi).
     if full_path.startswith("api"):
-        return {"detail": "Not Found"}
+        raise HTTPException(status_code=404, detail="Not Found")
 
     return FileResponse("static/index.html")

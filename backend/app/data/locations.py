@@ -1,21 +1,6 @@
+# ponytail: sadece Adzuna'nin destekledigi ulkeler. Turkey/Sweden/Japan Adzuna'da yok
+# (/jobs/tr/ -> 404), Careerjet ise AWS IP'lerinden 403 verdigi icin kullanilamiyor.
 locations = {
-  "Turkey": [
-    "Istanbul",
-    "Ankara",
-    "Izmir",
-    "Bursa",
-    "Antalya",
-    "Adana",
-    "Konya",
-    "Gaziantep",
-    "Kocaeli",
-    "Mersin",
-    "Kayseri",
-    "Eskisehir",
-    "Samsun",
-    "Trabzon"
-  ],
-
   "Germany": [
     "Berlin",
     "Munich",
@@ -104,14 +89,6 @@ locations = {
   ],
 
 
-  "Sweden": [
-    "Stockholm",
-    "Gothenburg",
-    "Malmo",
-    "Uppsala"
-  ],
-
-
   "Poland": [
     "Warsaw",
     "Krakow",
@@ -125,13 +102,25 @@ locations = {
     "Melbourne",
     "Brisbane",
     "Perth"
-  ],
-
-  
-  "Japan": [
-    "Tokyo",
-    "Osaka",
-    "Kyoto",
-    "Yokohama"
   ]
 }
+
+
+# Adzuna ulke kodlari (api.adzuna.com/v1/api/jobs/<kod>/search)
+COUNTRY_CODES = {
+  "Germany": "de",
+  "United States": "us",
+  "United Kingdom": "gb",
+  "Netherlands": "nl",
+  "France": "fr",
+  "Canada": "ca",
+  "Spain": "es",
+  "Italy": "it",
+  "Poland": "pl",
+  "Australia": "au",
+}
+
+# ponytail: iki dict elle senkron tutuluyor; import'ta patlasin ki sessizce kaymasin
+assert locations.keys() == COUNTRY_CODES.keys(), (
+    "locations ve COUNTRY_CODES ayni ulkeleri icermeli"
+)
